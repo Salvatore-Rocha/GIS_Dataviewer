@@ -53,8 +53,8 @@ sources = html.Div(
                     target="_blank",
                 ),
                 html.A(
-                    "Code (.py file) |   ",
-                    href="https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/4c775b644374f6c5b217d7138729e154eba22261/src/app.py",
+                    "Code (app.py file in SRC dir) |   ",
+                    href="https://github.com/Salvatore-Rocha/GIS_Dataviewer/tree/4057ce472dd834469364c90b95c28019616072a9/src",
                     target="_blank",
                 
                 ),
