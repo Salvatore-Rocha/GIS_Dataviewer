@@ -582,7 +582,7 @@ main_text = ["This project visualizes the Airbnb scene in ", html.B("Mexico City
 
 app =  dash.Dash(__name__, 
                  external_stylesheets= [dbc.themes.PULSE, dbc.icons.FONT_AWESOME, dbc_css],)
-#server = app.server
+server = app.server
 app.layout = dbc.Container(style={'padding': '50px'},
     children=[
             header,
@@ -735,5 +735,5 @@ def clustering_map(n_clicks, clustersss):
         return dash.no_update
     
 if __name__=='__main__':
-    app.run_server(debug=True, port=8050)
-    #app.run_server()
+    #app.run_server(debug=True, port=8050)
+    app.run_server()
