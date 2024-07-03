@@ -13,11 +13,12 @@ import numpy as np
 from sklearn.cluster import KMeans
 from shapely import wkt
 
-# Create a Plotly layout with the desired dbc template
+
 load_figure_template(["pulse", "pulse_dark"])
 layout = go.Layout(template= pio.templates["pulse"])
 
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
+font_family = 'Times New Roman, Times, serif'
 
 # Work Files 
 json_file_url = 'https://raw.githubusercontent.com/Salvatore-Rocha/GIS_Dataviewer/4e8c24d98c3b6b9ac5ee4cd08de263316b35a7da/Files/cdmx-alcaldias-4326.json'
@@ -36,12 +37,13 @@ listings.set_crs(epsg=4326, inplace=True)
 
 header = html.H1(
     "Discover Mexico City's Airbnb Scene", 
-    className="bg-primary text-white p-2 mb-2 text-center"
+    className="p-2 mb-2 text-center",
+    style={'fontFamily': font_family, 'textTransform': 'uppercase'},
                 )
 
 sources = html.Div(
     [
-        html.P("By Eduardo Salvador Rocha"),
+        html.P("By Eduardo Salvador Rocha", style={'fontFamily': font_family}),
         html.Label(
             [
                 "Links: ",
@@ -62,7 +64,7 @@ sources = html.Div(
                     target="_blank",
                 
                 ),
-            ]
+            ], style={'fontFamily': font_family,}
         ),
     ]
 )
@@ -93,22 +95,21 @@ def alcaldias_fig():
         f'rgba(255, 0, 0, {transparency})'        # Red
     ]
 
-    # Add polygons to the plot
+    # Adding polygons to the plot
     for i, feature in enumerate(json_data_alc['features']):
         lon, lat = zip(*feature['geometry']['coordinates'][0])
         fig.add_trace(go.Scattermapbox(
-            mode="lines",  # Added 'markers' mode to ensure filled polygons
+            mode="lines", 
             lon=lon + (lon[0],),
             lat=lat + (lat[0],),
             hoverinfo="text",
             text=feature['properties']['NOMBRE'],
-            name=feature['properties']['NOMBRE'],  # Set the trace name
-            fill='toself',  # Fill the trace with color
-            line=dict(width=1, color=palette[i % len(palette)]),  # Set the line color to the palette color
-            fillcolor=palette[i % len(palette)]  # Set the fill color to the palette color
+            name=feature['properties']['NOMBRE'],  
+            fill='toself', 
+            line=dict(width=1, color=palette[i % len(palette)]), 
+            fillcolor=palette[i % len(palette)] 
         ))
 
-    # Set up the layout
     fig.update_layout(
         width=1000, 
         height=800, 
@@ -129,8 +130,14 @@ def colonias_fig():
                                         locations=geojson_data_colonias.index, 
                                         mapbox_style="carto-positron",
                                         zoom=5,
-                                        opacity=0.5
+                                        opacity=0.25,
+                                        color_discrete_sequence=["green"],
+                                        custom_data=['col_name', 'mun_name'],
                                         )
+    
+    fig.update_traces(
+        hovertemplate="<b>Colonia</b>: %{customdata[0]}<br><b>Delegacion</b>: %{customdata[1]}"
+    )
 
     fig.update_layout(
         width=1000, 
@@ -186,8 +193,6 @@ def airbnb_by(type):
                     size_max=10,
                     mapbox_style= "carto-positron") 
         
-
-    # Update layout to set custom window size and title
     fig.update_layout(
         width=1000, 
         height=800, 
@@ -198,17 +203,16 @@ def airbnb_by(type):
     return fig
 
 def airbnb_density():
-    # Create a density map on a map using Plotly Express
+    
     fig = px.density_mapbox(listings, 
                             lat="latitude", 
                             lon="longitude", 
-                            radius=10,  # Adjust the radius as needed
+                            radius=10,  
                             color_continuous_scale='Jet',
                             zoom=10, 
-                            mapbox_style="open-street-map")  # Change map style here
+                            mapbox_style="open-street-map")
 
 
-    # Update layout to set custom window size and title
     fig.update_layout(
         width=1000, 
         height=800, 
@@ -230,12 +234,15 @@ def choropleth_col(type):
             featureidkey="properties.col_code", 
             color='price',
             color_continuous_scale="Jet",
-            hover_data={'col_name': True, 'mun_name': True},
             range_color=[0,2000],
             opacity=0.8,
             mapbox_style="carto-darkmatter",
+            custom_data=['col_name', 'mun_name',"price"]
         )
-    
+        
+        fig.update_traces(
+            hovertemplate="<b>Colonia</b>: %{customdata[0]}<br><b>Delegacion</b>: %{customdata[1]}<br><b>Precio Prom</b>: %{customdata[2]}")
+        
     else:
         col_by_reviews = listings.groupby(['col_code', 'col_name',"mun_name"])["number_of_reviews"].mean().round(2).reset_index()
         
@@ -249,8 +256,12 @@ def choropleth_col(type):
             hover_data={'col_name': True, 'mun_name': True},
             range_color=[0,80],
             opacity=0.8,
+            custom_data=['col_name', 'mun_name',"number_of_reviews"],
             mapbox_style="carto-darkmatter",
         )
+        
+        fig.update_traces(
+            hovertemplate="<b>Colonia</b>: %{customdata[0]}<br><b>Delegacion</b>: %{customdata[1]}<br><b>Num de Reseñas Prom</b>: %{customdata[2]}")
 
     fig.update_layout(
         width=1000, 
@@ -272,8 +283,12 @@ def choropleth_del(type):
             color='price',
             color_continuous_scale="Jet",
             mapbox_style="carto-darkmatter",
+            custom_data=['mun_name',"price"],
             opacity=0.8,
                 )
+        
+        fig.update_traces(
+            hovertemplate="<b>Delegacion</b>: %{customdata[0]}<br><b>Precio Prom</b>: %{customdata[1]}")
     else:
         alc_by_review =  listings.groupby('mun_name')['number_of_reviews'].mean().round(2).reset_index()
         fig = px.choropleth_mapbox(
@@ -284,26 +299,29 @@ def choropleth_del(type):
             color='number_of_reviews',
             color_continuous_scale="Jet",
             mapbox_style="carto-darkmatter",
+            custom_data=['mun_name',"number_of_reviews"],
             opacity=0.8,
                 )
+        
+        fig.update_traces(
+            hovertemplate="<b>Delegacion</b>: %{customdata[0]}<br><b>Num de Reseñas Prom</b>: %{customdata[1]}")
         
     fig.update_layout(
             width=1000, 
             height=800, 
-            #title=("Alcaldias CDMX by Price"),
-            #mapbox_style="carto-positron",
             mapbox_zoom=9.8,
             mapbox_center={"lat": 19.3215, "lon": -99.18235},
             margin={"r":0,"t":0,"l":0,"b":0})
     return fig
 
 def cluster_map(clusters):
-    # Spatial Clustering (Example using KMeans)
-    X = listings[['longitude', 'latitude']]  # Assuming you have columns for longitude and latitude
+    # Spatial Clustering using KMeans
+    X = listings[['longitude', 'latitude']]  
     kmeans = KMeans(n_clusters=clusters)
     listings['cluster'] = kmeans.fit_predict(X)
 
-    # Computing convex hulls of each cluster (this ONLY WORKS on GEODATAFRAMES, otherwise it will fail!!)
+    # Computing convex hulls of each cluster 
+    # This ONLY WORKS on GEODATAFRAMES not normal Pandas dataframes; make sure to use geoframes or otherwise it will fail!!
     convex_hulls = listings.groupby('cluster')['geometry'].apply(lambda x: x.unary_union.convex_hull)
     color_scale = px.colors.cyclical.Phase
 
@@ -330,16 +348,16 @@ def cluster_map(clusters):
             marker=dict(size=0),
             hoverinfo='none',
             fill='toself',
-            showlegend=False  # Hide legend for this trace
+            showlegend=False 
         ))
 
     fig.update_layout(
         width=1000, 
         height=800, 
-        #title=("Colonies in CDMX by Price"),
         mapbox_zoom=10.1,
         mapbox_center={"lat": 19.3415, "lon": -99.18235},
-        margin={"r":0,"t":0,"l":0,"b":0})
+        margin={"r":0,"t":0,"l":0,"b":0},
+        coloraxis_showscale=False)
 
     return fig
 
@@ -351,27 +369,30 @@ tab1 = dbc.Tab([
                                 style={"display": "flex",
                                     "justify-content": "center",
                                     "align-items": "center",
-                                    "height": "100px",}
+                                    "height": "100px",
+                                    'fontFamily': font_family,
+                                    }
                                 ),
                         dcc.RadioItems(id="radio_it_tab1",
                                                 options= ["Borough / Alcaldía", "Neighborhood / Colonia"], 
                                                 value='Borough / Alcaldía', 
                                                 inline=False,
-                                                #className="text-success",
-                                                inputStyle={"margin-left":"6px", "margin-right": "2px"},
-                                                #style={'fontSize': '12px'}
+                                                #inputStyle={"margin-left":"6px", "margin-right": "2px"},
+                                                style={'fontFamily': font_family}
                                                 ),
                         html.Br(),
-                        dbc.Button(children = "Update graph", 
+                        dbc.Button(children = "See Map", 
                                 id="button-tab1", 
                                 n_clicks=0,
-                                #style={'width': '20%'}
+                                style={'fontFamily': font_family,}
                                 ),
                         html.Br(),
                         html.Br(),
-                        html.P(children=text_alcaldias, id="text-tab1"),
+                        html.P(children=text_alcaldias, 
+                               id="text-tab1",
+                               ),
                             ],width= 3,
-                            style={'textAlign': 'center'}
+                            style={'textAlign': 'left', "font-size": '14px','fontFamily': font_family}
                             ),
                     dbc.Col([
                             html.Br(),
@@ -379,23 +400,23 @@ tab1 = dbc.Tab([
                                             type="default",
                                             children= dcc.Graph(
                                                                 id = "graph-tab1",
-                                                                #The default figure is gonna be the "Alcaldias" one
                                                                 figure = alcaldias_fig()                            
                                                                 ),
                                         )
                             ],width= 9)
                         ])
-                ], label="Title Tab 1",)
+                ], label="Overview",)
 
-tab2 = dbc.Tab([ 
+tab3 = dbc.Tab([ 
                 dbc.Row([
                     dbc.Col([
-                        html.H4(children = "This is a long title to be updated somehow",
+                        html.H4(children = "The power of individual data visualization",
                                 id="titl-tab2",
                                 style={"display": "flex",
                                     "justify-content": "center",
                                     "align-items": "center",
-                                    "height": "100px"}
+                                    "height": "100px",
+                                    'fontFamily': font_family,}
                                 ),
                         html.Br(),
                         dcc.RadioItems(id="radio_it_tab2",
@@ -404,16 +425,19 @@ tab2 = dbc.Tab([
                                             "Airbnb by Density Area"], 
                                     value="Airbnb by Density Area", 
                                     inline=False,
-                                    #className="text-success",
                                     inputStyle={"margin-left":"6px", "margin-right": "2px"},
-                                    #style={'fontSize': '12px'}
+                                    style={'fontFamily': font_family,}
                                     ),
                         html.Br(),
-                        dbc.Button(children = "Update graph", 
+                        dbc.Button(children = "Show Areas", 
                                         id="button-tab2", 
                                         n_clicks=None,
-                                        #style={'width': '15%'}
+                                        style={'fontFamily': font_family,}
                                         ),
+                        html.Br(),
+                        html.Br(),
+                        html.P("Visualizing individual data points rather than jurisdictions provides a more detailed and granular view of the data. This approach helps identify specific trends, hotspots, and outliers that might be obscured when data is aggregated by larger administrative areas. For Airbnb listings, it allows users to pinpoint exact locations, understand neighborhood dynamics, and make more informed decisions based on precise information rather than generalizations.", 
+                               style={'font-size': '14px'})
                             ],width=3),
                     dbc.Col([
                         html.Br(),
@@ -421,20 +445,19 @@ tab2 = dbc.Tab([
                                         type="default",
                                         children= dcc.Graph(
                                                             id = "graph-tab2",
-                                                            #The default figure is gonna be the "by Price" one
                                                             figure = {}                            
                                                             ),
                                     )
                             ],style={"display": "flex",
-                                "justifyContent": "center",  # centers horizontally
-                                "alignItems": "center"        # centers vertically
-                                },
+                                "justifyContent": "center",  
+                                "alignItems": "center",      
+                                'fontFamily': font_family,},
                             width=9)
-                        ],style={'textAlign': 'center'},
+                        ],style={'textAlign': 'left','fontFamily': font_family,},
                         justify="center")
-                ],label="Title Tab 2")
+                ],label="By Data Points")
 
-tab3 = dbc.Tab([
+tab4 = dbc.Tab([
             dbc.Row([
                 dbc.Col([
                     html.Br(),
@@ -442,22 +465,22 @@ tab3 = dbc.Tab([
                                     type="default",
                                     children= dcc.Graph(
                                                         id = "graph-tab3",
-                                                        #The default figure is gonna be the "by Price" one
                                                         figure = {}                            
                                                         ),
                                 )
                         ],style={"display": "flex",
-                            "justifyContent": "center",  # centers horizontally
-                            "alignItems": "center"        # centers vertically
-                            }
+                            "justifyContent": "center",  
+                            "alignItems": "center",        
+                            'fontFamily': font_family,}
                         ,width=9),
                 dbc.Col([
-                    html.H4(children = "This is a long title to be updated somehow tab3",
+                    html.H4(children = "Trends by boroughs and neighborhoods",
                                 id="titl-tab3",
                                 style={"display": "flex",
                                     "justify-content": "center",
                                     "align-items": "center",
-                                    "height": "100px"}
+                                    "height": "100px",
+                                    'fontFamily': font_family,}
                                 ),
                         html.Br(),
                         dbc.Row([ #Radio Items
@@ -467,9 +490,8 @@ tab3 = dbc.Tab([
                                               "Neighbourhood/ Colonia"], 
                                     value="Neighbourhood/ Colonia", 
                                     inline=False,
-                                    #className="text-success",
                                     inputStyle={"margin-left":"6px", "margin-right": "2px"},
-                                    style={'fontSize': '12px'}
+                                    style={'fontSize': '12px','fontFamily': font_family,}
                                     ),
                                 ],width=6),
                             dbc.Col([
@@ -478,9 +500,8 @@ tab3 = dbc.Tab([
                                               "Reviews Number"], 
                                     value="Price", 
                                     inline=False,
-                                    #className="text-success",
                                     inputStyle={"margin-left":"6px", "margin-right": "2px"},
-                                    style={'fontSize': '12px'}
+                                    style={'fontSize': '12px','fontFamily': font_family,}
                                     ),
                                 ],width=6),
                             ]),
@@ -488,38 +509,49 @@ tab3 = dbc.Tab([
                         dbc.Button(children = "Update graph", 
                                         id="button-tab3", 
                                         n_clicks=None,
-                                        #style={'width': '15%'}
+                                        style={'fontFamily': font_family,}
                                         ),
+                        html.Br(),
+                        html.Br(),
+                        html.P("Visualizing data by jurisdictions is useful because it provides a clear and organized overview of trends and patterns within defined administrative areas. This approach helps identify regional differences, allocate resources efficiently, and develop targeted policies. For Airbnb listings, visualizing by jurisdictions allows users to understand broader market dynamics, compare different areas easily, and make decisions based on regional insights rather than isolated data points.", 
+                               style={'font-size': '14px', 'fontFamily': font_family,})
                         ],width=3),
                     ]) 
-            ],label="Title Tab 3")
+            ],label="By Jurisdictions")
 
-tab4 = dbc.Tab([
+tab2 = dbc.Tab([
             dbc.Row([
                 dbc.Col([
-                    html.H4(children = "This is a long title to be updated somehow tab4",
+                    html.H4(children = "Segmentation of Mexico City's Airbnbs Using Data Clustering",
                                 id="titl-tab4",
                                 style={"display": "flex",
                                     "justify-content": "center",
                                     "align-items": "center",
-                                    "height": "100px"}
+                                    "height": "100px",
+                                    'fontFamily': font_family,}
                                 ),
-                        html.Br(),
-                        html.P("Number of Clusters:",style={'font-size': '12px'}),
-                        dcc.Slider(id="slider-tab4",
+                    html.Br(),    
+                    html.P("Number of Clusters:",style={'font-size': '12px','fontFamily': font_family,}),
+                    dcc.Slider(id="slider-tab4",
                                    min=5, 
                                    max=20,
                                    step= 1,
                                    value=12,
                                    included=False
                                 ),
-                        html.Br(),
-                        dbc.Button(children = "Update graph", 
+                    html.Br(),
+                    dbc.Button(children = "Show Clusters", 
                                         id="button-tab4", 
                                         n_clicks=None,
-                                        #style={'width': '15%'}
+                                        style={'fontFamily': font_family,}
                                         ),
-                        ],width=3),
+                    html.Br(),
+                    html.Br(),
+                    html.P("Clustering is a data analysis technique that groups similar data points together based on certain characteristics. In the context of Airbnb listings, clustering can be useful for identifying patterns and trends, such as popular neighborhoods, price ranges, and types of accommodations. By grouping similar listings, hosts and guests can gain insights into market dynamics, optimize pricing strategies, and enhance the overall user experience by highlighting the most relevant options based on specific preferences.", 
+                           style={'font-size': '14px',
+                                  'fontFamily': font_family,
+                                  }),
+                    ],width=3),
                 dbc.Col([
                     html.Br(),
                     dcc.Loading(id="loading-tab4",
@@ -530,16 +562,23 @@ tab4 = dbc.Tab([
                                                         ),
                                 )
                         ],style={"display": "flex",
-                            "justifyContent": "center",  # centers horizontally
-                            "alignItems": "center"        # centers vertically
-                            }
+                            "justifyContent": "center",
+                            "alignItems": "center",
+                            'fontFamily': font_family,}
                         ,width=9),
-                    ],style={'textAlign': 'center'},
+                    ],style={'textAlign': 'center','fontFamily': font_family,},
                         justify="center") 
-            ],label="Title Tab 4")
+            ],label="Clustering")
 
-tabs = dbc.Card(dbc.Tabs([tab1,tab2,tab3,tab4], style={'font-style': 'italic'}))
+tabs = dbc.Card(dbc.Tabs([tab1,
+                          tab2,
+                          tab3,
+                          tab4], 
+                         style={'font-style': 'italic',
+                                'fontFamily': font_family, 
+                                "font-size":"13px"}))
 
+main_text = ["This project visualizes the Airbnb scene in ", html.B("Mexico City"), " using Plotly and Dash, providing insights into administrative divisions and individual hosts. It analyzes Airbnb listings based on price and number of reviews. Many choose to visit Mexico City (CDMX) for its vibrant neighborhoods and unique experiences. Staying in Roma and Condesa offers trendy cafes and nightlife, Polanco provides luxury shopping and dining, Coyoacán boasts a bohemian vibe and historic sites, Centro Histórico features iconic landmarks, and La Roma Norte combines tranquility with lively nightlife. These options make a stay in CDMX truly memorable."]
 
 app =  dash.Dash(__name__, 
                  external_stylesheets= [dbc.themes.PULSE, dbc.icons.FONT_AWESOME, dbc_css],)
@@ -547,8 +586,13 @@ app =  dash.Dash(__name__,
 app.layout = dbc.Container(style={'padding': '50px'},
     children=[
             header,
-            html.P(["This is a paragraph with a ",  html.U(html.I(html.B("bold, italic, and underlined")))," word in it. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam lobortis, lectus et interdum blandit, nulla dui ornare augue, at pellentesque nunc est vel ante. Quisque ullamcorper in justo congue feugiat. Integer sit amet justo aliquet, ornare odio in, luctus eros. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vulputate congue turpis, sit amet blandit sapien. Nulla accumsan eu erat non volutpat. Donec convallis blandit nisi eget consectetur. Donec sodales lobortis dictum. Fusce vehicula risus non dui lacinia, interdum feugiat urna eleifend. Donec maximus in nibh a lacinia. Cras et turpis semper, pellentesque ipsum nec, euismod ex. Integer varius viverra ullamcorper. Etiam id hendrerit nunc."]),
-            dbc.Row([ # 3 tabs
+            html.P(main_text,
+                   style={'fontFamily': font_family,
+                          'textAlign': 'justify',
+                          'paddingLeft': '10rem',
+                          'paddingRight': '10rem'}),
+            html.Br(),
+            dbc.Row([ # 4 tabs
                     tabs
                     ]),
             dbc.Row([ #Links/ Sources
@@ -673,7 +717,7 @@ def clustering_map(n_clicks, clustersss):
     
     if n_clicks == None:
         #Colonia, Price
-        return cluster_map(12)
+        return cluster_map(6)
     
     ctx = callback_context
     if not ctx.triggered:
