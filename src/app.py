@@ -69,6 +69,25 @@ sources = html.Div(
     ]
 )
 
+text_alcaldias = "In Mexico City, alcaldías are administrative divisions similar to boroughs or districts. They serve as local government \
+    units responsible for managing various aspects of urban life within their boundaries, including public services, infrastructure, and \
+    community development. Each alcaldía is headed by a mayor (alcaldesa or alcalde) who is elected by the residents of the area. These \
+    officials work to address the unique needs and challenges of their communities while collaborating with city-wide authorities to ensure \
+    coordinated governance across Mexico's vibrant capital."
+
+tit_alc = "Alcaldías in Focus"
+
+text_colonia = "Mexico City's alcaldías encompass numerous neighborhoods, known as colonias, each with its own distinct character and \
+    history. With a total of 16 alcaldías and over 300 colonias, the city is a tapestry of diverse cultures and lifestyles. From the \
+    historic charm of Coyoacán to the bustling energy of Condesa, every colonia offers a unique experience for residents and visitors \
+    alike. In Mexico City, the distinction of being the first registered colonia goes to Santa María la Ribera, established in the late\
+    19th century during the Porfirio Díaz era. It's known for its picturesque kiosk in the middle of a pond. On the other hand, the latest \
+    registered colonia is Ciudad Olímpica, situated in the Venustiano Carranza alcaldía. It was developed as part of the city's \
+    infrastructure for the 1968 Olympics, with residential areas constructed to accommodate athletes and officials."
+
+tit_col = "City's Vibrant Colonias"
+
+#Tab1
 def alcaldias_fig():
     fig = go.Figure()
 
@@ -147,24 +166,55 @@ def colonias_fig():
         margin={"r":0,"t":0,"l":0,"b":0})
     return fig
 
-text_alcaldias = "In Mexico City, alcaldías are administrative divisions similar to boroughs or districts. They serve as local government \
-    units responsible for managing various aspects of urban life within their boundaries, including public services, infrastructure, and \
-    community development. Each alcaldía is headed by a mayor (alcaldesa or alcalde) who is elected by the residents of the area. These \
-    officials work to address the unique needs and challenges of their communities while collaborating with city-wide authorities to ensure \
-    coordinated governance across Mexico's vibrant capital."
+#Tab2
+def cluster_map(clusters):
+    # Spatial Clustering using KMeans
+    X = listings[['longitude', 'latitude']]  
+    kmeans = KMeans(n_clusters=clusters)
+    listings['cluster'] = kmeans.fit_predict(X)
 
-tit_alc = "Alcaldías in Focus"
+    # Computing convex hulls of each cluster 
+    # This ONLY WORKS on GEODATAFRAMES not normal Pandas dataframes; make sure to use geoframes or otherwise it will fail!!
+    convex_hulls = listings.groupby('cluster')['geometry'].apply(lambda x: x.unary_union.convex_hull)
+    color_scale = px.colors.cyclical.Phase
 
-text_colonia = "Mexico City's alcaldías encompass numerous neighborhoods, known as colonias, each with its own distinct character and \
-    history. With a total of 16 alcaldías and over 300 colonias, the city is a tapestry of diverse cultures and lifestyles. From the \
-    historic charm of Coyoacán to the bustling energy of Condesa, every colonia offers a unique experience for residents and visitors \
-    alike. In Mexico City, the distinction of being the first registered colonia goes to Santa María la Ribera, established in the late\
-    19th century during the Porfirio Díaz era. It's known for its picturesque kiosk in the middle of a pond. On the other hand, the latest \
-    registered colonia is Ciudad Olímpica, situated in the Venustiano Carranza alcaldía. It was developed as part of the city's \
-    infrastructure for the 1968 Olympics, with residential areas constructed to accommodate athletes and officials."
+    # Cluster map
+    fig = px.scatter_mapbox(listings, 
+                            lat="latitude", 
+                            lon="longitude", 
+                            color="cluster",
+                            color_continuous_scale=color_scale, 
+                            size_max=15,
+                            zoom=10, 
+                            mapbox_style="carto-positron")
 
-tit_col = "City's Vibrant Colonias"
 
+    # Add convex hulls to the plot
+    for cluster, hull in zip(convex_hulls.index, convex_hulls):
+        lon, lat = hull.exterior.xy
+        lon = list(lon)
+        lat = list(lat)
+        fig.add_trace(go.Scattermapbox(
+            lon=lon,
+            lat=lat,
+            mode='lines',
+            marker=dict(size=0),
+            hoverinfo='none',
+            fill='toself',
+            showlegend=False 
+        ))
+
+    fig.update_layout(
+        width=1000, 
+        height=800, 
+        mapbox_zoom=10.1,
+        mapbox_center={"lat": 19.3415, "lon": -99.18235},
+        margin={"r":0,"t":0,"l":0,"b":0},
+        coloraxis_showscale=False)
+
+    return fig
+
+#Tab3
 def airbnb_by(type):
     if type == "number_of_reviews":
         fig = px.scatter_mapbox(listings, 
@@ -223,6 +273,7 @@ def airbnb_density():
 
     return fig
 
+#Tab4
 def choropleth_col(type):
     if type == "Price":
         col_by_prices = listings.groupby(['col_code', 'col_name',"mun_name"])["price"].mean().round(2).reset_index()
@@ -314,53 +365,6 @@ def choropleth_del(type):
             margin={"r":0,"t":0,"l":0,"b":0})
     return fig
 
-def cluster_map(clusters):
-    # Spatial Clustering using KMeans
-    X = listings[['longitude', 'latitude']]  
-    kmeans = KMeans(n_clusters=clusters)
-    listings['cluster'] = kmeans.fit_predict(X)
-
-    # Computing convex hulls of each cluster 
-    # This ONLY WORKS on GEODATAFRAMES not normal Pandas dataframes; make sure to use geoframes or otherwise it will fail!!
-    convex_hulls = listings.groupby('cluster')['geometry'].apply(lambda x: x.unary_union.convex_hull)
-    color_scale = px.colors.cyclical.Phase
-
-    # Cluster map
-    fig = px.scatter_mapbox(listings, 
-                            lat="latitude", 
-                            lon="longitude", 
-                            color="cluster",
-                            color_continuous_scale=color_scale, 
-                            size_max=15,
-                            zoom=10, 
-                            mapbox_style="carto-positron")
-
-
-    # Add convex hulls to the plot
-    for cluster, hull in zip(convex_hulls.index, convex_hulls):
-        lon, lat = hull.exterior.xy
-        lon = list(lon)
-        lat = list(lat)
-        fig.add_trace(go.Scattermapbox(
-            lon=lon,
-            lat=lat,
-            mode='lines',
-            marker=dict(size=0),
-            hoverinfo='none',
-            fill='toself',
-            showlegend=False 
-        ))
-
-    fig.update_layout(
-        width=1000, 
-        height=800, 
-        mapbox_zoom=10.1,
-        mapbox_center={"lat": 19.3415, "lon": -99.18235},
-        margin={"r":0,"t":0,"l":0,"b":0},
-        coloraxis_showscale=False)
-
-    return fig
-
 tab1 = dbc.Tab([ 
                 dbc.Row([
                     dbc.Col([
@@ -407,10 +411,10 @@ tab1 = dbc.Tab([
                         ])
                 ], label="Overview",)
 
-tab3 = dbc.Tab([ 
-                dbc.Row([
-                    dbc.Col([
-                        html.H4(children = "The power of individual data visualization",
+tab2 = dbc.Tab([
+            dbc.Row([
+                dbc.Col([
+                    html.H4(children = "Segmentation of Mexico City's Airbnbs Using Data Clustering",
                                 id="titl-tab2",
                                 style={"display": "flex",
                                     "justify-content": "center",
@@ -418,8 +422,60 @@ tab3 = dbc.Tab([
                                     "height": "100px",
                                     'fontFamily': font_family,}
                                 ),
+                    html.Br(),    
+                    html.P("Number of Clusters:",style={'font-size': '12px','fontFamily': font_family,}),
+                    dcc.Slider(id="slider-tab2",
+                                   min=5, 
+                                   max=20,
+                                   step= 1,
+                                   value=12,
+                                   included=False
+                                ),
+                    dcc.Store(id='store_tab2', data=12),
+                    html.Br(),
+                    dbc.Button(children = "Show Clusters", 
+                                        id="button-tab2", 
+                                        n_clicks=None,
+                                        style={'fontFamily': font_family,}
+                                        ),
+                    html.Br(),
+                    html.Br(),
+                    html.P("Clustering is a data analysis technique that groups similar data points together based on certain characteristics. In the context of Airbnb listings, clustering can be useful for identifying patterns and trends, such as popular neighborhoods, price ranges, and types of accommodations. By grouping similar listings, hosts and guests can gain insights into market dynamics, optimize pricing strategies, and enhance the overall user experience by highlighting the most relevant options based on specific preferences.", 
+                           style={'font-size': '14px',
+                                  'fontFamily': font_family,
+                                  }),
+                    ],width=3),
+                dbc.Col([
+                    html.Br(),
+                    dcc.Loading(id="loading-tab2",
+                                    type="default",
+                                    children= dcc.Graph(
+                                                        id = "graph-tab2",
+                                                        figure = {}                           
+                                                        ),
+                                )
+                        ],style={"display": "flex",
+                            "justifyContent": "center",
+                            "alignItems": "center",
+                            'fontFamily': font_family,}
+                        ,width=9),
+                    ],style={'textAlign': 'center','fontFamily': font_family,},
+                        justify="center") 
+            ],label="Clustering")
+
+tab3 = dbc.Tab([ 
+                dbc.Row([
+                    dbc.Col([
+                        html.H4(children = "The power of individual data visualization",
+                                id="titl-tab3",
+                                style={"display": "flex",
+                                    "justify-content": "center",
+                                    "align-items": "center",
+                                    "height": "100px",
+                                    'fontFamily': font_family,}
+                                ),
                         html.Br(),
-                        dcc.RadioItems(id="radio_it_tab2",
+                        dcc.RadioItems(id="radio_it_tab3",
                                     options= ["Airbnbs by Price", 
                                             "Airbnbs by # of Reviews",
                                             "Airbnb by Density Area"], 
@@ -428,9 +484,10 @@ tab3 = dbc.Tab([
                                     inputStyle={"margin-left":"6px", "margin-right": "2px"},
                                     style={'fontFamily': font_family,}
                                     ),
+                        dcc.Store(id='store_tab3', data="Airbnb by Density Area"),
                         html.Br(),
                         dbc.Button(children = "Show Areas", 
-                                        id="button-tab2", 
+                                        id="button-tab3", 
                                         n_clicks=None,
                                         style={'fontFamily': font_family,}
                                         ),
@@ -441,10 +498,10 @@ tab3 = dbc.Tab([
                             ],width=3),
                     dbc.Col([
                         html.Br(),
-                        dcc.Loading(id="loading-tab2",
+                        dcc.Loading(id="loading-tab3",
                                         type="default",
                                         children= dcc.Graph(
-                                                            id = "graph-tab2",
+                                                            id = "graph-tab3",
                                                             figure = {}                            
                                                             ),
                                     )
@@ -461,10 +518,10 @@ tab4 = dbc.Tab([
             dbc.Row([
                 dbc.Col([
                     html.Br(),
-                    dcc.Loading(id="loading-tab3",
+                    dcc.Loading(id="loading-tab4",
                                     type="default",
                                     children= dcc.Graph(
-                                                        id = "graph-tab3",
+                                                        id = "graph-tab4",
                                                         figure = {}                            
                                                         ),
                                 )
@@ -475,7 +532,7 @@ tab4 = dbc.Tab([
                         ,width=9),
                 dbc.Col([
                     html.H4(children = "Trends by boroughs and neighborhoods",
-                                id="titl-tab3",
+                                id="titl-tab4",
                                 style={"display": "flex",
                                     "justify-content": "center",
                                     "align-items": "center",
@@ -485,7 +542,7 @@ tab4 = dbc.Tab([
                         html.Br(),
                         dbc.Row([ #Radio Items
                             dbc.Col([
-                                dcc.RadioItems(id="radio1_it_tab3",
+                                dcc.RadioItems(id="radio1_it_tab4",
                                     options= ["Borough / Alcaldia",
                                               "Neighbourhood/ Colonia"], 
                                     value="Neighbourhood/ Colonia", 
@@ -495,7 +552,7 @@ tab4 = dbc.Tab([
                                     ),
                                 ],width=6),
                             dbc.Col([
-                                dcc.RadioItems(id="radio2_it_tab3",
+                                dcc.RadioItems(id="radio2_it_tab4",
                                     options= ["Price",
                                               "Reviews Number"], 
                                     value="Price", 
@@ -505,9 +562,10 @@ tab4 = dbc.Tab([
                                     ),
                                 ],width=6),
                             ]),
+                        dcc.Store(id='store_tab4', data={'Geo': 'Neighbourhood/ Colonia', 'Type': 'Price'}),
                         html.Br(),
                         dbc.Button(children = "Update graph", 
-                                        id="button-tab3", 
+                                        id="button-tab4", 
                                         n_clicks=None,
                                         style={'fontFamily': font_family,}
                                         ),
@@ -519,57 +577,6 @@ tab4 = dbc.Tab([
                     ]) 
             ],label="By Jurisdictions")
 
-tab2 = dbc.Tab([
-            dbc.Row([
-                dbc.Col([
-                    html.H4(children = "Segmentation of Mexico City's Airbnbs Using Data Clustering",
-                                id="titl-tab4",
-                                style={"display": "flex",
-                                    "justify-content": "center",
-                                    "align-items": "center",
-                                    "height": "100px",
-                                    'fontFamily': font_family,}
-                                ),
-                    html.Br(),    
-                    html.P("Number of Clusters:",style={'font-size': '12px','fontFamily': font_family,}),
-                    dcc.Slider(id="slider-tab4",
-                                   min=5, 
-                                   max=20,
-                                   step= 1,
-                                   value=12,
-                                   included=False
-                                ),
-                    html.Br(),
-                    dbc.Button(children = "Show Clusters", 
-                                        id="button-tab4", 
-                                        n_clicks=None,
-                                        style={'fontFamily': font_family,}
-                                        ),
-                    html.Br(),
-                    html.Br(),
-                    html.P("Clustering is a data analysis technique that groups similar data points together based on certain characteristics. In the context of Airbnb listings, clustering can be useful for identifying patterns and trends, such as popular neighborhoods, price ranges, and types of accommodations. By grouping similar listings, hosts and guests can gain insights into market dynamics, optimize pricing strategies, and enhance the overall user experience by highlighting the most relevant options based on specific preferences.", 
-                           style={'font-size': '14px',
-                                  'fontFamily': font_family,
-                                  }),
-                    ],width=3),
-                dbc.Col([
-                    html.Br(),
-                    dcc.Loading(id="loading-tab4",
-                                    type="default",
-                                    children= dcc.Graph(
-                                                        id = "graph-tab4",
-                                                        figure = {}                            
-                                                        ),
-                                )
-                        ],style={"display": "flex",
-                            "justifyContent": "center",
-                            "alignItems": "center",
-                            'fontFamily': font_family,}
-                        ,width=9),
-                    ],style={'textAlign': 'center','fontFamily': font_family,},
-                        justify="center") 
-            ],label="Clustering")
-
 tabs = dbc.Card(dbc.Tabs([tab1,
                           tab2,
                           tab3,
@@ -578,11 +585,15 @@ tabs = dbc.Card(dbc.Tabs([tab1,
                                 'fontFamily': font_family, 
                                 "font-size":"13px"}))
 
-main_text = ["This project visualizes the Airbnb scene in ", html.B("Mexico City"), " using Plotly and Dash, providing insights into administrative divisions and individual hosts. It analyzes Airbnb listings based on price and number of reviews. Many choose to visit Mexico City (CDMX) for its vibrant neighborhoods and unique experiences. Staying in Roma and Condesa offers trendy cafes and nightlife, Polanco provides luxury shopping and dining, Coyoacán boasts a bohemian vibe and historic sites, Centro Histórico features iconic landmarks, and La Roma Norte combines tranquility with lively nightlife. These options make a stay in CDMX truly memorable."]
+main_text = ["This project visualizes the Airbnb scene in ", 
+             html.B("Mexico City"), 
+             " using Plotly and Dash, providing insights into administrative divisions and individual hosts. It analyzes Airbnb listings based on price and number of reviews. Many choose to visit Mexico City (CDMX) for its vibrant neighborhoods and unique experiences. Staying in Roma and Condesa offers trendy cafes and nightlife, Polanco provides luxury shopping and dining, Coyoacán boasts a bohemian vibe and historic sites, Centro Histórico features iconic landmarks, and La Roma Norte combines tranquility with lively nightlife. These options make a stay in CDMX truly memorable."]
+
+#############---------- App Layout ----------#############
 
 app =  dash.Dash(__name__, 
                  external_stylesheets= [dbc.themes.PULSE, dbc.icons.FONT_AWESOME, dbc_css],)
-server = app.server
+#server = app.server
 app.layout = dbc.Container(style={'padding': '50px'},
     children=[
             header,
@@ -601,7 +612,8 @@ app.layout = dbc.Container(style={'padding': '50px'},
 ],fluid=True,
   className="dbc dbc-ag-grid")
 
-# Updating Tab1
+#############---------- Updating Tab1 ------------################
+
 @callback(
     Output("graph-tab1", "figure"),
     Output("text-tab1","children"),
@@ -637,103 +649,81 @@ def city_view(n_clicks, type):
 
     return fig, text, titl
 
+#############---------- Updating Tab2 ------------################
 
-#Updating Tab2
+@app.callback(
+    Output('store_tab2', 'data'),
+    Input('slider-tab2', 'value')
+)
+def update_store(selected_value):
+    return selected_value
+
 @callback(
     Output("graph-tab2", "figure"),
-    [Input("button-tab2", "n_clicks")],
-    [State("radio_it_tab2", "value")]  
+    Input("button-tab2", "n_clicks"),
+    State('store_tab2', 'data')
 )  
-def airbnb_geo(n_clicks, type):
-    
-    if n_clicks == None:
-        return airbnb_density()
-    
-    ctx = callback_context
-    if not ctx.triggered:
-        # No input triggered the callback, return default figure or raise Exception
-        return dash.no_update
-    else:
-        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    
-    if triggered_id == "button-tab2":
-        
-        if type == "Airbnbs by Price":
+def clustering_map(n_clicks, clustersss):
+    return cluster_map(clustersss)
 
-            fig =  airbnb_by("price")          
+#############---------- Updating Tab3 ------------################
 
-        elif type == "Airbnbs by # of Reviews":
-            
-            fig =  airbnb_by("number_of_reviews")  
-            
-        else:
-            fig = airbnb_density()
-    else:
-        # Radio item interaction, do not update the graph
-        return dash.no_update
+@app.callback(
+    Output('store_tab3', 'data'),
+    Input('radio_it_tab3', 'value')
+)
+def update_store(selected_value):
+    return selected_value
 
-    return fig
-
-#Updating Tab3
 @callback(
     Output("graph-tab3", "figure"),
-    Input("button-tab3", "n_clicks"),
-    Input("radio1_it_tab3", "value"),
-    Input("radio2_it_tab3", "value"),  
+    [Input("button-tab3", "n_clicks")],
+    [State("store_tab3", "data")]  
 )  
-def choro_plots(n_clicks, del_col, price_review):
-    
-    if n_clicks == None:
-        #Colonia, Price
-        return choropleth_col("Price")
-    
-    ctx = callback_context
-    if not ctx.triggered:
-        # No input triggered the callback, return default figure or raise Exception
-        return dash.no_update
-    else:
-        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    
-    if triggered_id == "button-tab3":
+def airbnb_geo(n_clicks, type):
+    if type == "Airbnbs by Price":
         
-        if del_col == "Neighbourhood/ Colonia":
-
-            return choropleth_col(price_review)            
+        fig =  airbnb_by("price")
+    
+    elif type == "Airbnbs by # of Reviews":
+        
+        fig =  airbnb_by("number_of_reviews")  
             
-        else:
-            
-            return choropleth_del(price_review)
     else:
-        # Radio item interaction, do not update the graph
-        return dash.no_update
+        fig = airbnb_density()
+    
+    return fig
 
-#Updating Tab4
+#############---------- Updating Tab4 ------------################
+@app.callback(
+    Output('store_tab4', 'data'),
+    Input('radio1_it_tab4', 'value'),
+    Input('radio2_it_tab4', 'value'),
+    State('store_tab4', 'data')
+)
+def update_store(selected_value_x, selected_value_y, current_data):
+    current_data['Geo'] = selected_value_x
+    current_data['Type'] = selected_value_y
+    return current_data
+
 @callback(
     Output("graph-tab4", "figure"),
     Input("button-tab4", "n_clicks"),
-    Input("slider-tab4", "value"),
+    #Input("radio1_it_tab4", "value"),
+    #Input("radio2_it_tab4", "value"),
+    State('store_tab4', 'data')  
 )  
-def clustering_map(n_clicks, clustersss):
-    
-    if n_clicks == None:
-        #Colonia, Price
-        return cluster_map(6)
-    
-    ctx = callback_context
-    if not ctx.triggered:
-        # No input triggered the callback, return default figure or raise Exception
-        return dash.no_update
+def choro_plots(n_clicks, current_data):
+
+    if current_data['Geo'] == "Neighbourhood/ Colonia":
+
+        return choropleth_col(current_data['Type'])            
+            
     else:
-        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    
-    if triggered_id == "button-tab4":
-        
-        return cluster_map(clustersss)
-    
-    else:
-        # Radio item interaction, do not update the graph
-        return dash.no_update
+            
+        return choropleth_del(current_data['Type']) 
+
     
 if __name__=='__main__':
-    #app.run_server(debug=True, port=8050)
-    app.run_server()
+    app.run_server(debug=True, port=8050)
+    #app.run_server()
