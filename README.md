@@ -31,7 +31,7 @@ This project is designed to visualize the Airbnb scene in Mexico City and is mad
   - Original GeoJSON file was downloaded from [Public.opendatasoft](https://public.opendatasoft.com/explore/dataset/georef-mexico-colonia/export/?disjunctive.sta_code&disjunctive.sta_name&disjunctive.mun_code&disjunctive.mun_name&disjunctive.col_code&disjunctive.col_name&sort=year&location=15,19.38479,-99.23717&basemap=jawg.light)
  
 
-### External links
+### 🔗 External links
 
 To better understand parts of the code, the logic behind certain structures, and the transformations applied, please refer to the following Google Colab notebook.
 
