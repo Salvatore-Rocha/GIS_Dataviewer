@@ -1,13 +1,15 @@
 # Discover Mexico City's Airbnb Scene
 ### Project Overview
-This project is designed to offer a comprehensive visualization of the Airbnb scene in Mexico City, leveraging the powerful data visualization libraries Plotly and Dash. By providing an interactive and user-friendly interface, this project allows users to delve into various aspects of Mexico City's Airbnb market, examining different administrative divisions (alcaldías) and neighborhoods (colonias).
+This project is designed to visualize the Airbnb scene in Mexico City and is made using the Python libraries of Plotly and Dash. This web-app aims to allow users to delve into various aspects of Mexico City's Airbnb market data set using an interactive and user-friendly interface, examining different administrative divisions (alcaldías) and neighborhoods (colonias).
 
-### Key aspects of the project:
+### Visual aspects of the project:
 
 ![GIS Viewer Tab1](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/GIS_viewer_Tab_1ov.png?raw=true)
 ![GIS Viewer Tab2](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/GIS_viewer_Tab_2ov.jpg?raw=true)
 ![GIS Viewer Tab3](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/GIS_viewer_Tab_3ov.png?raw=true)
 ![GIS Viewer Tab4](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/GIS_viewer_Tab_4ov.png?raw=true)
+
+### Key components of the project:
 
 - Visualization of Administrative Divisions: Users can explore the geographical layout and boundaries of Mexico City's 16 alcaldías. Each alcaldía can be visualized in detail, showing how Airbnb listings are distributed across these larger administrative regions.
 
@@ -22,11 +24,12 @@ This project is designed to offer a comprehensive visualization of the Airbnb sc
 
 
 ### Data Sources
-- Working file: [Cdmx-alcaldias-4326.json](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/cdmx-alcaldias-4326.json)
+- Airbnb data set: [Insideairbnb.com/mexico-city](https://insideairbnb.com/mexico-city/)
+- CDMX Alcaldias JSON file: [Cdmx-alcaldias-4326.json](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/cdmx-alcaldias-4326.json)
   - The original file was downloaded from [Idegeo.centrogeo.org.mx](https://idegeo.centrogeo.org.mx/layers/geonode%3Aalcaldias)
 - [Georef-mexico-colonia.geojson](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/georef-mexico-colonia.geojson)
-  - The original GeoJSON file was downloaded from [Public.opendatasoft](https://public.opendatasoft.com/explore/dataset/georef-mexico-colonia/export/?disjunctive.sta_code&disjunctive.sta_name&disjunctive.mun_code&disjunctive.mun_name&disjunctive.col_code&disjunctive.col_name&sort=year&location=15,19.38479,-99.23717&basemap=jawg.light)
-- Airbnb data set: [Insideairbnb.com/mexico-city](https://insideairbnb.com/mexico-city/) 
+  - Original GeoJSON file was downloaded from [Public.opendatasoft](https://public.opendatasoft.com/explore/dataset/georef-mexico-colonia/export/?disjunctive.sta_code&disjunctive.sta_name&disjunctive.mun_code&disjunctive.mun_name&disjunctive.col_code&disjunctive.col_name&sort=year&location=15,19.38479,-99.23717&basemap=jawg.light)
+ 
 
 ### External links
 
