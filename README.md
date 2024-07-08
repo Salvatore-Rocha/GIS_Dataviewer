@@ -27,3 +27,9 @@ This project is designed to offer a comprehensive visualization of the Airbnb sc
 - [Georef-mexico-colonia.geojson](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/georef-mexico-colonia.geojson)
   - The original GeoJSON file was downloaded from [Public.opendatasoft](https://public.opendatasoft.com/explore/dataset/georef-mexico-colonia/export/?disjunctive.sta_code&disjunctive.sta_name&disjunctive.mun_code&disjunctive.mun_name&disjunctive.col_code&disjunctive.col_name&sort=year&location=15,19.38479,-99.23717&basemap=jawg.light)
 - Airbnb data set: [Insideairbnb.com/mexico-city](https://insideairbnb.com/mexico-city/) 
+
+### External links
+
+To better understand parts of the code, the logic behind certain structures, and the transformations applied, please refer to the following Google Colab notebook.
+
+[Google Colab Notebook](https://colab.research.google.com/drive/1Xnx0tj9BDDt_NgxE2d2gdFr93wkmJ-bh?usp=sharing)
