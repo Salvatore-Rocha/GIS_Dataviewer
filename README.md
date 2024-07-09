@@ -2,6 +2,10 @@
 ### 🌎 Project Overview
 This project is designed to visualize the Airbnb scene in Mexico City and is made using the Python libraries of Plotly and Dash. This web-app aims to allow users to delve into various aspects of Mexico City's Airbnb market data set using an interactive and user-friendly interface, examining different administrative divisions (alcaldías) and neighborhoods (colonias).
 
+### 🤖 Web app link:  [Discover Mexico City's Airbnb Scene](https://discover-mexico-citys-airbnb-scene.onrender.com/)
+
+**Note**: The app is hosted on a free instance of render that will spin down with inactivity, which can delay requests by 50 seconds _or more_. **_Please be patient_**.
+
 ### 🔎 Visual aspects of the project:
 
 ![GIS Viewer Tab1](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/GIS_viewer_Tab_1ov.png?raw=true)
