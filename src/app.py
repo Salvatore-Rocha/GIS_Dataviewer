@@ -592,7 +592,7 @@ main_text = ["This project uses Plotly and Dash to visualize Airbnb listings in 
 
 app =  dash.Dash(__name__, 
                  external_stylesheets= [dbc.themes.PULSE, dbc.icons.FONT_AWESOME, dbc_css],)
-#server = app.server
+server = app.server
 app.layout = dbc.Container(style={'padding': '50px'},
     children=[
             header,
