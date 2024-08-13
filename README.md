@@ -1,21 +1,21 @@
 # Discover Mexico City's Airbnb Scene
 ### 🌎 Project Overview
-This project is designed to visualize the Airbnb scene in Mexico City and is made using the Python libraries of Plotly and Dash. This web-app aims to allow users to delve into various aspects of Mexico City's Airbnb market data set using an interactive and user-friendly interface, examining different administrative divisions (alcaldías) and neighborhoods (colonias).
+This project visualizes the Airbnb landscape in Mexico City using Plotly and Dash, focusing on price and user reviews across two levels: administrative divisions (16 alcaldías) and neighborhoods (1812 colonias).
 
-### 🤖 Web app link:  [Discover Mexico City's Airbnb Scene](https://discover-mexico-citys-airbnb-scene.onrender.com/)
+### 🤖 Web app link ➡️  [Discover Mexico City's Airbnb Scene](https://discover-mexico-citys-airbnb-scene.onrender.com/)
 
 **Note**: The app is hosted on a free instance of render that will spin down with inactivity, which can delay requests by 50 seconds _or more_. **_Please be patient_**.
 
 ### 🔎 Visual aspects of the project:
-
 ![GIS Viewer Tab1](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/GIS_viewer_Tab_1ov.png?raw=true)
 ![GIS Viewer Tab2](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/GIS_viewer_Tab_2ov.jpg?raw=true)
 ![GIS Viewer Tab3](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/GIS_viewer_Tab_3ov.png?raw=true)
 ![GIS Viewer Tab4](https://github.com/Salvatore-Rocha/GIS_Dataviewer/blob/main/Files/GIS_viewer_Tab_4ov.png?raw=true)
 
-### 🔑 Key components:
+### 🔑 Key Insights:
 
-- Visualization of Administrative Divisions: Users can explore the geographical layout and boundaries of Mexico City's 16 alcaldías. Each alcaldía can be visualized in detail, showing how Airbnb listings are distributed across these larger administrative regions.
+- Visualization of Administrative Divisions:
+CDMX has a high density of Airbnbs in the central zone, where the Central Business District is located, alongside the majority of cultural and historical landmarks. In contrast, the southern area is characterized by natural landscapes, including Xochimilco Lake, Desierto de los Leones National Park, and the Ajusco Mountains. The northern and eastern regions are predominantly industrial and working-class, featuring densely populated neighborhoods and areas facing significant social challenges. It is important to consider these geographical and socioeconomic factors in CDMX, as they all impact the distribution of Airbnb listings in these areas.
 
 - Neighborhood Insights: The project also provides a detailed view of the smaller neighborhoods (colonias), allowing for a more granular analysis of the Airbnb listings. This helps in understanding the dynamics within individual neighborhoods and comparing them across the city.
 - 
