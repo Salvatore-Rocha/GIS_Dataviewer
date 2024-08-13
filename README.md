@@ -14,12 +14,14 @@ This project visualizes the Airbnb landscape in Mexico City using Plotly and Das
 
 ### 🔑 Key Insights:
 
-- Visualization of Administrative Divisions:
+- #### Visualization of Administrative Divisions:
 CDMX has a high density of Airbnbs in the central zone, where the Central Business District is located, alongside the majority of cultural and historical landmarks. In contrast, the southern area is characterized by natural landscapes, including Xochimilco Lake, Desierto de los Leones National Park, and the Ajusco Mountains. The northern and eastern regions are predominantly industrial and working-class, featuring densely populated neighborhoods and areas that face significant social challenges. It is important to consider these geographical and socioeconomic factors in CDMX, as they all impact the distribution of Airbnb listings in these areas.
 
-- Neighborhood Insights: The project also provides a closer look at the distribution of Airbnb listings in smaller neighborhoods (colonias), allowing for a more granular analysis. We observe a match between high Airbnb prices and listing density in the luxury areas of the city (Condesa, Polanco, Lomas de Chapultepec, Historic Centre). This insight enables more precise targeting of investment opportunities in real estate, optimization of pricing strategies, and identification of areas to address supply and demand imbalances across the city.
+- #### Neighborhood Insights:
+The project also provides a closer look at the distribution of Airbnb listings in smaller neighborhoods (colonias), allowing for a more granular analysis. We observe a match between high Airbnb prices and listing density in the luxury areas of the city (Condesa, Polanco, Lomas de Chapultepec, Historic Centre). This insight enables more precise targeting of investment opportunities in real estate, optimization of pricing strategies, and identification of areas to address supply and demand imbalances across the city.
   
-- Airbnb Listings Analysis: The core of the project involves analyzing Airbnb listings based on various factors:
+- #### Airbnb Listings Analysis:
+  The core of the project involves analyzing Airbnb listings based on various factors:
   - Price: Visualize how the prices of Airbnb listings vary across different regions, helping to identify more expensive and more affordable areas.
   - Number of Reviews: A further NLP sentiment analysis must be conducted to identify what users value most based on their reviews. The number of reviews also highlights tourist hotspots and areas with high engagement.
   - Density: Analyzing the density of listings helps in understanding the concentration of Airbnb properties, which can indicate areas with high competition or high demand.
