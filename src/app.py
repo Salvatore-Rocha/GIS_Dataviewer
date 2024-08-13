@@ -585,10 +585,9 @@ tabs = dbc.Card(dbc.Tabs([tab1,
                                 'fontFamily': font_family, 
                                 "font-size":"13px"}))
 
-main_text = ["This project visualizes the Airbnb scene in ", 
+main_text = ["This project uses Plotly and Dash to visualize Airbnb listings in ", 
              html.B("Mexico City"), 
-             " using Plotly and Dash, providing insights into administrative divisions and individual hosts. It analyzes Airbnb listings based on price and number of reviews. Many choose to visit Mexico City (CDMX) for its vibrant neighborhoods and unique experiences. Staying in Roma and Condesa offers trendy cafes and nightlife, Polanco provides luxury shopping and dining, Coyoacán boasts a bohemian vibe and historic sites, Centro Histórico features iconic landmarks, and La Roma Norte combines tranquility with lively nightlife. These options make a stay in CDMX truly memorable."]
-
+             ", offering detailed insights into both administrative divisions and individual listings. By analyzing prices and review counts, the project identifies key areas such as Roma, Condesa, Polanco, Coyoacán, Centro Histórico, and La Roma Norte. Understanding these neighborhood characteristics helps travelers choose accommodations that match their preferences, whether they seek vibrant nightlife, luxury experiences, historic charm, or a blend of tranquility and activity. For hosts and property managers, these insights enable better targeting of potential guests and optimization of listings to align with the distinct attractions and experiences that make CDMX memorable."]
 #############---------- App Layout ----------#############
 
 app =  dash.Dash(__name__, 
